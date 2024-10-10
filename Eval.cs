@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using fraction;
 
 namespace fraction
@@ -41,6 +42,7 @@ namespace fraction
 			return white - black;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static int NumberOfSetBits(ulong i)
 		{
 			return (int)System.Runtime.Intrinsics.X86.Popcnt.X64.PopCount(i);
@@ -76,20 +78,38 @@ namespace fraction
 			0b0000000000111100000000000000000000000000000000000000000011111111,
 		};
 
-		private static Dictionary<Piece, ulong> pieceMasks2 = new Dictionary<Piece, ulong>{
+		// trifft nur auf pawns zu, rest wird ignoriert
+		private static ulong[] pieceMasks2 = new ulong[]
+		{
+			0b111111111111111100000000000000000000000000000000,
+			0,
+			0,
+			0,
+			0,
+			0,
+			0b1111111111111111,
+			0,
+			0,
+			0,
+			0,
+			0,
+		};
+
+		/*private static Dictionary<Piece, ulong> pieceMasks2 = new Dictionary<Piece, ulong>{
 						{Piece.wPawn,0b111111111111111100000000000000000000000000000000},
 						{Piece.bPawn,0b1111111111111111},
-				};
-
+				};*/
 		private static float[] pieceFightValue = new float[] { 1f, 3f, 2.7f, 5f, 2f, 9f, 1f, 3f, 2.7f, 5f, 2f, 9f };
 
 
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		static float relativeValue(ulong bb, Piece type)
 		{
 			float value = NumberOfSetBits(bb & pieceMasks1[(int)type]) * pieceFightValue[(int)type] * 0.1f;
 
-			if (type == Piece.wPawn || type == Piece.bPawn) value += NumberOfSetBits(bb & pieceMasks2[type]) * pieceFightValue[(int)type] * 0.1f;
+			// branchless durch lut
+			value += NumberOfSetBits(bb & pieceMasks2[(int)type]) * pieceFightValue[(int)type] * 0.1f;
 
 			return value;
 		}
