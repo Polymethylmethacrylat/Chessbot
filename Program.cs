@@ -13,7 +13,6 @@ using System.Security.Cryptography.X509Certificates;
 
 
 */
-
 namespace fraction
 {
 	public enum Piece : int
@@ -34,7 +33,6 @@ namespace fraction
 
 	public class Program
 	{
-
 		/// <summary>
 		/// Printed das board
 		/// </summary>
@@ -78,7 +76,6 @@ namespace fraction
 			Console.Write("My move is: \n");
 			return Console.ReadLine();
 		}
-
 		/// <summary>
 		/// Nimmt einen string der form "e4 f6" an, gibt bei 0 die erste Pos an, bei 1 die zweite
 		/// </summary>
@@ -90,7 +87,6 @@ namespace fraction
 
 			return new int[] { pos1, pos2 };
 		}
-
 		/// <summary>
 		/// Die rekursive Funktion die das game am laufen hält
 		/// </summary>
@@ -149,7 +145,6 @@ h3: 8457
 h4: 9329   
 Sum: 197742
 */
-
 		private static void perft(int d)
 		{
 			Chessboard b1 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
@@ -224,7 +219,6 @@ Sum: 197742
 			//DisplayBoard(n1);
 
 			//return;
-
 			Minimax.positions = 0;
 			n1 = b1.generateBoardWithMove(Utility.ANtoPos("b8"), Utility.ANtoPos("c6"), Piece.bKnight);
 			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
@@ -264,7 +258,6 @@ Sum: 197742
 		}
 
 		static Chessboard visualBoard; //board auf dem die "wahre" position gespeichert wird
-
 		static void Main(string[] args)
 		{
 			//visualBoard = new Chessboard();

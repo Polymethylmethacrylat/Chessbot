@@ -54,7 +54,6 @@ namespace fraction
 
         ==> muss sehr intensiv gebenchmarked werden 
         */
-
         static void generateMovesForDoublePiece(Chessboard b, ulong pieceBB, bool forWhite, ref Vision[] possibleMoves, ref int currIndex)
         {
             int amount = Eval.NumberOfSetBits(pieceBB);
@@ -184,7 +183,7 @@ namespace fraction
         }
 
 
-        public static Chessboard[] generateBoards_CLEAN(Chessboard b, bool whitesTurn)
+        public static Chessboard[] generateBoards(Chessboard b, bool whitesTurn)
         {
             Vision[] visions = generateMoves(b, whitesTurn);
 
@@ -229,8 +228,5 @@ namespace fraction
 
             return new Vision(i, bb, pieceType);
         }
-
-
-
     }
 }

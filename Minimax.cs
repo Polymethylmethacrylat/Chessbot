@@ -16,24 +16,23 @@ namespace fraction
 				return staticEval;
 			}
 
-			//gehört eigentlich in nächsten codeblock, sitzt nur hier für debugging (perft)
 			//quiescence search, 3 als hard limit für depth increase
 			if (pos.afterCapturePly && pos.quiescenceSearchPlies < 3)
 			{
 				nonQuietEndNodes++;
 				pos.quiescenceSearchPlies++;
-				// depth++;
+				depth++;
 			}
 
 
 			if (depth == 0)
 			{
-				//Program.DisplayBoard(pos);
 				positions++;
 				return staticEval;
 			}
 
-			Chessboard[] cbs = MoveGen.generateBoards_CLEAN(pos, whitesTurn);
+
+			Chessboard[] cbs = MoveGen.generateBoards(pos, whitesTurn);
 			if (cbs.Length == 0) return staticEval;
 
 			if (whitesTurn)
@@ -45,7 +44,7 @@ namespace fraction
 					maxEval = Math.Max(maxEval, eval);
 					alpha = Math.Max(alpha, eval);
 
-					// if (beta <= alpha) break;
+					if (beta <= alpha) break;
 				}
 				return maxEval;
 			}
@@ -58,7 +57,7 @@ namespace fraction
 					minEval = Math.Min(minEval, eval);
 					beta = Math.Min(beta, eval);
 
-					//if (beta <= alpha) break;
+					if (beta <= alpha) break;
 				}
 				return minEval;
 			}

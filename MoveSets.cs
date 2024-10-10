@@ -22,7 +22,6 @@ namespace fraction
             bool isWhite = IsBitSet(board.whitePiecesBB, posIndex);
             ulong sameColorPieces = isWhite ? board.whitePiecesBB : board.blackPiecesBB;
 
-
             if (IsBitSet(board.wPawnBB, posIndex))
             {
                 pieceType = Piece.wPawn;
@@ -37,7 +36,7 @@ namespace fraction
 
                 ulong targetSqrs = (attackSqrs & enemyPiecesBB);
                 ulong moveSqrs = (~allPiecesBB & (1ul << posIndex + 8));
-                
+
                 int sqrTwoAbove = posIndex + 16;
                 moveSqrs |= (moveSqrs != 0 && !IsBitSet(allPiecesBB, sqrTwoAbove)) ? (y == 1 ? 1ul << sqrTwoAbove : 0) : 0;
                 return targetSqrs | moveSqrs;
@@ -285,7 +284,6 @@ namespace fraction
         /// <returns></returns>
         public static ulong getPseudoTargetSqrsRook(ulong pieceBB, int posIndex)
         {
-            //die ganze funktion muss sehr optimiert sein (ist aber schon sehr gut)
             int y = posIndex >> 3;
             int x = posIndex & 7;
 
@@ -306,8 +304,6 @@ namespace fraction
             ulong vertiTop = (verti >> posIndex) << posIndex;
             ulong vertiBottom = ((verti << reverseIndex) >> reverseIndex) * nullifier;
 
-
-            //kann vlt branchless umgeschrieben werden
             //die bits werden isoliert
             int indexWest = horiWest == 0 ? 8 * y : getBiggestBit(horiWest);//wird null wenn horiWest=0
             int indexEast = horiEast == 0 ? 8 * y + 7 : getSmallestBit(horiEast) % 64;
@@ -334,23 +330,22 @@ namespace fraction
         /// <returns></returns>
         public static ulong interpolateHorizontal(int i1, int i2)
         {
-            /* ulong n1 = ;
-              n1 <<= 1;
-             n1 -= 1;
-             n1 <<= i2; */
+            /* 
+            ulong n1 = 1 << i1-i2;
+            n1 <<= 1;
+            n1 -= 1;
+            n1 <<= i2; 
+            */
             return (((1ul << (i1 - i2)) << 1) - 1) << i2;
-            //  return ((1ul << (i1 - i2 + 1)) - 1) << i2;//gibt fehler bei 63 , 0 weil dann der mittlere term=64, dh gar kein shift findet statt
         }
-
+        //  return ((1ul << (i1 - i2 + 1)) - 1) << i2;//gibt fehler bei 63 , 0 weil dann der mittlere term=64, dh gar kein shift findet statt
 
         public static ulong interpolateVertical(int i1, int i2)
         {
             int x = i1 & 7;//basically modulo 8
 
-
             ulong filler = interpolateHorizontal(i1, i2);
             ulong verticalMask = verticalLineBB(x);
-
 
             return filler & verticalMask;
         }
@@ -384,7 +379,7 @@ namespace fraction
         /// <returns></returns>
         private static ulong horizontalLineBB(int y)
         {
-            //y = [0 , 7]
+            //y Element von [0 , 7]
             return 0b11111111ul << (y * 8);
         }
 

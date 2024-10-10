@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace fraction
 {
+
 	public class Chessboard
 	{
 		//0 ist ganz rechts, 63 ist ganz links, 0=a1, 63=h8
@@ -29,7 +30,6 @@ namespace fraction
 		public bool afterCapturePly = false;
 		public int quiescenceSearchPlies = 0;
 
-		public Chessboard() {}
 
 		/// <summary>
 		/// Hiermit kann durch FENtoPos funktionen ein board gebaut werden
@@ -53,6 +53,11 @@ namespace fraction
 
 			whitePiecesBB = wPawnBB | wBishopBB | wKingBB | wKnightBB | wRookBB | wQueenBB;
 			blackPiecesBB = bPawnBB | bBishopBB | bKingBB | bKnightBB | bRookBB | bQueenBB;
+		}
+
+		public Chessboard()
+		{
+
 		}
 
 		public Chessboard(ulong wKingBB, ulong bKingBB, ulong wKnightBB, ulong bKnightBB,
@@ -136,7 +141,7 @@ namespace fraction
 			//bool isCapture = type.isWhite() ? MoveSets.IsBitSet(blackPiecesBB, endIndex) : MoveSets.IsBitSet(whitePiecesBB, endIndex);
 			bool isCapture = MoveSets.IsBitSet(blackPiecesBB | whitePiecesBB, endIndex);
 
-			if (MoveSets.IsBitSet(blackPiecesBB | whitePiecesBB, endIndex) !=
+			/* if (MoveSets.IsBitSet(blackPiecesBB | whitePiecesBB, endIndex) !=
 			(type.isWhite() ? MoveSets.IsBitSet(blackPiecesBB, endIndex) : MoveSets.IsBitSet(whitePiecesBB, endIndex)))
 			{
 				Program.DisplayBoard(this);
@@ -144,7 +149,7 @@ namespace fraction
 				Utility.printBitBoard(MoveSets.getPseudoLegalMoves_bb(this, startIndex, out type));
 				Utility.printBitBoard(whitePiecesBB | blackPiecesBB);
 				Environment.Exit(0);
-			}
+			} */
 
 			ulong wKingBB_ = Utility.setBBtoNullAt(wKingBB, endIndex);
 			ulong bKingBB_ = Utility.setBBtoNullAt(bKingBB, endIndex);
