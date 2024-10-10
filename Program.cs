@@ -14,120 +14,119 @@ using System.Security.Cryptography.X509Certificates;
 
 */
 
-
 namespace fraction
 {
-    public enum Piece : int
-    {
-        wPawn,
-        wBishop,
-        wKnight,
-        wRook,
-        wKing,
-        wQueen,
-        bPawn,
-        bBishop,
-        bKnight,
-        bRook,
-        bKing,
-        bQueen,
-    }
+	public enum Piece : int
+	{
+		wPawn,
+		wBishop,
+		wKnight,
+		wRook,
+		wKing,
+		wQueen,
+		bPawn,
+		bBishop,
+		bKnight,
+		bRook,
+		bKing,
+		bQueen,
+	}
 
-    public class Program
-    {
+	public class Program
+	{
 
-        /// <summary>
-        /// Printed das board
-        /// </summary>
-        /// <param name="board"></param>
-        public static void DisplayBoard(Chessboard b)
-        {
-            if (b == null) return;
-            for (int y = 7; y >= 0; y--)
-            {
-                string currRank = "";
-                for (int x = 0; x < 8; x++)
-                {
-                    int posIndex = y * 8 + x;
+		/// <summary>
+		/// Printed das board
+		/// </summary>
+		/// <param name="board"></param>
+		public static void DisplayBoard(Chessboard b)
+		{
+			//if (b == null) return;
+			for (int y = 7; y >= 0; y--)
+			{
+				string currRank = "";
+				for (int x = 0; x < 8; x++)
+				{
+					int posIndex = y * 8 + x;
 
-                    if (b.hasPieceAt(posIndex))
-                    {
-                        currRank += b.getPieceAt(posIndex).getSymbol() + " | ";
-                    }
-                    else
-                    {
-                        currRank += "  | ";
-                    }
-                }
+					if (b.hasPieceAt(posIndex))
+					{
+						currRank += b.getPieceAt(posIndex).getSymbol() + " | ";
+					}
+					else
+					{
+						currRank += "  | ";
+					}
+				}
 
-                Console.WriteLine(currRank);
-                Console.WriteLine("-------------------------------");
+				Console.WriteLine(currRank);
+				Console.WriteLine("-------------------------------");
 
-            }
-            Console.WriteLine("");
-        }
+			}
+			Console.WriteLine("");
+		}
 
-        static void DisplayBoard(string fen)
-        {
-            DisplayBoard(new Chessboard(Utility.FENtoPosition(fen)));
-        }
+		static void DisplayBoard(string fen)
+		{
+			DisplayBoard(new Chessboard(Utility.FENtoPosition(fen)));
+		}
 
 
 
-        static string getPlayerMove()
-        {
-            Console.Write("My move is: \n");
-            return Console.ReadLine();
-        }
+		static string getPlayerMove()
+		{
+			Console.Write("My move is: \n");
+			return Console.ReadLine();
+		}
 
-        /// <summary>
-        /// Nimmt einen string der form "e4 f6" an, gibt bei 0 die erste Pos an, bei 1 die zweite
-        /// </summary>
-        /// <param name="an"></param>
-        static int[] translateMove(string an)
-        {
-            int pos1 = Utility.ANtoPos(an.Substring(0, 2));
-            int pos2 = Utility.ANtoPos(an.Substring(3, 2));
+		/// <summary>
+		/// Nimmt einen string der form "e4 f6" an, gibt bei 0 die erste Pos an, bei 1 die zweite
+		/// </summary>
+		/// <param name="an"></param>
+		static int[] translateMove(string an)
+		{
+			int pos1 = Utility.ANtoPos(an.Substring(0, 2));
+			int pos2 = Utility.ANtoPos(an.Substring(3, 2));
 
-            return new int[] { pos1, pos2 };
-        }
+			return new int[] { pos1, pos2 };
+		}
 
-        /// <summary>
-        /// Die rekursive Funktion die das game am laufen hält
-        /// </summary>
-        static void MainLoop()
-        {
+		/// <summary>
+		/// Die rekursive Funktion die das game am laufen hält
+		/// </summary>
+		static void MainLoop()
+		{
 
-            Chessboard b1 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
-            Chessboard h4 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR"));
-            Chessboard h3 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/7P/PPPPPPP1/RNBQKBNR"));
-            Chessboard sus = new Chessboard(Utility.FENtoPosition("rnbqkbnr/1ppppppp/8/8/p7/5PK1/PPPPP1PP/RNBQ1BNR"));
-            Chessboard mateIn2 = new Chessboard(Utility.FENtoPosition("k7/ppp5/ppp5/8/8/8/8/KR6"));
-            Chessboard error = new Chessboard(Utility.FENtoPosition("r1bqkbnr/pppppppp/B7/8/4P3/8/PPPP1PPP/RNBQK1NR"));
-            var evalB1 = Chessboard.FromFEN("5r2/1p6/2p1k3/4Q2p/3P4/8/5PK1/q7");
-            // PGN_Formatter.CreateFormattedFile("mvl.txt", "gamesCarlsen.txt");
-            // PGN_Formatter.InsertPGNFileToFENdatabase("gamesCarlsen.txt", "carlsenfen.txt");
-            // PGN_Formatter.RemoveDuplicates("FENdatabase.txt");
+			Chessboard b1 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
+			Chessboard h4 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/7P/8/PPPPPPP1/RNBQKBNR"));
+			Chessboard h3 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/7P/PPPPPPP1/RNBQKBNR"));
+			Chessboard sus = new Chessboard(Utility.FENtoPosition("rnbqkbnr/1ppppppp/8/8/p7/5PK1/PPPPP1PP/RNBQ1BNR"));
+			Chessboard mateIn2 = new Chessboard(Utility.FENtoPosition("k7/ppp5/ppp5/8/8/8/8/KR6"));
+			Chessboard error = new Chessboard(Utility.FENtoPosition("r1bqkbnr/pppppppp/B7/8/4P3/8/PPPP1PPP/RNBQK1NR"));
+			var evalB1 = Chessboard.FromFEN("5r2/1p6/2p1k3/4Q2p/3P4/8/5PK1/q7");
+			// PGN_Formatter.CreateFormattedFile("mvl.txt", "gamesCarlsen.txt");
+			// PGN_Formatter.InsertPGNFileToFENdatabase("gamesCarlsen.txt", "carlsenfen.txt");
+			// PGN_Formatter.RemoveDuplicates("FENdatabase.txt");
 
-            //  Testing.BenchMark();
+			//  Testing.BenchMark();
 
-            /* 
-            todo transposition table
-            todo quiescence search
-            */
-            perft(3);
+			/* 
+			todo transposition table
+			todo quiescence search
+			*/
+			perft(3);
 
-            /*   var cb = b1;
-              DisplayBoard(cb);
-              Console.WriteLine(Minimax.miniMax(cb, 4, -20000, 20000, false));
-              Console.WriteLine("Positions: " + Minimax.positions);
-              Console.WriteLine("nonQuietEndNodes: " + Minimax.nonQuietEndNodes);
-   */
-            return;
-            //MainLoop();
-        }
+			/*   var cb = b1;
+				DisplayBoard(cb);
+				Console.WriteLine(Minimax.miniMax(cb, 4, -20000, 20000, false));
+				Console.WriteLine("Positions: " + Minimax.positions);
+				Console.WriteLine("nonQuietEndNodes: " + Minimax.nonQuietEndNodes);
+*/
+			return;
+			//MainLoop();
+		}
 
-        /* 
+		/* 
 Na3: 8885
 Nc3: 9757 2 zu viel
 Nf3: 9754 6 zu viel
@@ -149,128 +148,129 @@ g4: 9328
 h3: 8457   
 h4: 9329   
 Sum: 197742
- */
+*/
 
-        private static void perft(int d)
-        {
-            Chessboard b1 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
-            string l = "abcdefgh";
+		private static void perft(int d)
+		{
+			Chessboard b1 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
+			string l = "abcdefgh";
 
-            int sum = 0;
+			int sum = 0;
 
-            Minimax.positions = 0;
-            var n1 = b1.generateBoardWithMove(Utility.ANtoPos("b1"), Utility.ANtoPos("a3"), Piece.wKnight);
-            Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, false);
-            Console.WriteLine("Na3: " + Minimax.positions);
-            sum += Minimax.positions;
-
-
-            Minimax.positions = 0;
-            n1 = b1.generateBoardWithMove(Utility.ANtoPos("b1"), Utility.ANtoPos("c3"), Piece.wKnight);
-            Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, false);
-            Console.WriteLine("Nc3: " + Minimax.positions);
-            sum += Minimax.positions;
-
-            Minimax.positions = 0;
-            n1 = b1.generateBoardWithMove(Utility.ANtoPos("g1"), Utility.ANtoPos("f3"), Piece.wKnight);
-            Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, false);
-            Console.WriteLine("Nf3: " + Minimax.positions);
-            sum += Minimax.positions;
-
-            Minimax.positions = 0;
-            n1 = b1.generateBoardWithMove(Utility.ANtoPos("g1"), Utility.ANtoPos("h3"), Piece.wKnight);
-            Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, false);
-            Console.WriteLine("Nh3: " + Minimax.positions);
-            sum += Minimax.positions;
+			Minimax.positions = 0;
+			var n1 = b1.generateBoardWithMove(Utility.ANtoPos("b1"), Utility.ANtoPos("a3"), Piece.wKnight);
+			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, false);
+			Console.WriteLine("Na3: " + Minimax.positions);
+			sum += Minimax.positions;
 
 
-            foreach (char c in l)
-            {
+			Minimax.positions = 0;
+			n1 = b1.generateBoardWithMove(Utility.ANtoPos("b1"), Utility.ANtoPos("c3"), Piece.wKnight);
+			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, false);
+			Console.WriteLine("Nc3: " + Minimax.positions);
+			sum += Minimax.positions;
 
-                Minimax.positions = 0;
-                var a3 = b1.generateBoardWithMove(Utility.ANtoPos(c + "2"), Utility.ANtoPos(c + "3"), Piece.wPawn);
-                Minimax.miniMax(a3, d, float.MinValue, float.MaxValue, false);
-                Console.WriteLine(c + "3: " + Minimax.positions);
-                sum += Minimax.positions;
+			Minimax.positions = 0;
+			n1 = b1.generateBoardWithMove(Utility.ANtoPos("g1"), Utility.ANtoPos("f3"), Piece.wKnight);
+			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, false);
+			Console.WriteLine("Nf3: " + Minimax.positions);
+			sum += Minimax.positions;
 
-                Minimax.positions = 0;
-                a3 = b1.generateBoardWithMove(Utility.ANtoPos(c + "2"), Utility.ANtoPos(c + "4"), Piece.wPawn);
-                Minimax.miniMax(a3, d, float.MinValue, float.MaxValue, false);
-                Console.WriteLine(c + "4: " + Minimax.positions);
-                sum += Minimax.positions;
-            }
-
-            Console.WriteLine("Sum: " + sum);
-        }
-
-        private static void perft2(int d)
-        {
-            Chessboard b1 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
-            b1 = b1.generateBoardWithMove(Utility.ANtoPos("e2"), Utility.ANtoPos("e4"), Piece.wPawn);
-            Minimax.positions = 0;
-            /* Minimax.miniMax(b1, d, float.MinValue, float.MaxValue, false);
-            Console.WriteLine(Minimax.positions); */
-            string l = "abcdefgh";
+			Minimax.positions = 0;
+			n1 = b1.generateBoardWithMove(Utility.ANtoPos("g1"), Utility.ANtoPos("h3"), Piece.wKnight);
+			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, false);
+			Console.WriteLine("Nh3: " + Minimax.positions);
+			sum += Minimax.positions;
 
 
+			foreach (char c in l)
+			{
 
-            int sum = 0;
+				Minimax.positions = 0;
+				var a3 = b1.generateBoardWithMove(Utility.ANtoPos(c + "2"), Utility.ANtoPos(c + "3"), Piece.wPawn);
+				Minimax.miniMax(a3, d, float.MinValue, float.MaxValue, false);
+				Console.WriteLine(c + "3: " + Minimax.positions);
+				sum += Minimax.positions;
 
-            Minimax.positions = 0;
-            var n1 = b1.generateBoardWithMove(Utility.ANtoPos("b8"), Utility.ANtoPos("a6"), Piece.bKnight);
-            Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
-            Console.WriteLine("Na6: " + Minimax.positions);
-            sum += Minimax.positions;
+				Minimax.positions = 0;
+				a3 = b1.generateBoardWithMove(Utility.ANtoPos(c + "2"), Utility.ANtoPos(c + "4"), Piece.wPawn);
+				Minimax.miniMax(a3, d, float.MinValue, float.MaxValue, false);
+				Console.WriteLine(c + "4: " + Minimax.positions);
+				sum += Minimax.positions;
+			}
 
-            //DisplayBoard(n1);
+			Console.WriteLine("Sum: " + sum);
+		}
 
-            //return;
-
-            Minimax.positions = 0;
-            n1 = b1.generateBoardWithMove(Utility.ANtoPos("b8"), Utility.ANtoPos("c6"), Piece.bKnight);
-            Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
-            Console.WriteLine("Nc6: " + Minimax.positions);
-            sum += Minimax.positions;
-
-            Minimax.positions = 0;
-            n1 = b1.generateBoardWithMove(Utility.ANtoPos("g8"), Utility.ANtoPos("f6"), Piece.bKnight);
-            Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
-            Console.WriteLine("Nf6: " + Minimax.positions);
-            sum += Minimax.positions;
-
-            Minimax.positions = 0;
-            n1 = b1.generateBoardWithMove(Utility.ANtoPos("g8"), Utility.ANtoPos("h6"), Piece.bKnight);
-            Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
-            Console.WriteLine("Nh6: " + Minimax.positions);
-            sum += Minimax.positions;
+		private static void perft2(int d)
+		{
+			Chessboard b1 = new Chessboard(Utility.FENtoPosition("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR"));
+			b1 = b1.generateBoardWithMove(Utility.ANtoPos("e2"), Utility.ANtoPos("e4"), Piece.wPawn);
+			Minimax.positions = 0;
+			/* Minimax.miniMax(b1, d, float.MinValue, float.MaxValue, false);
+			Console.WriteLine(Minimax.positions); */
+			string l = "abcdefgh";
 
 
-            foreach (char c in l)
-            {
 
-                Minimax.positions = 0;
-                var a3 = b1.generateBoardWithMove(Utility.ANtoPos(c + "7"), Utility.ANtoPos(c + "6"), Piece.bPawn);
-                Minimax.miniMax(a3, d, float.MinValue, float.MaxValue, true);
-                Console.WriteLine(c + "6: " + Minimax.positions);
-                sum += Minimax.positions;
+			int sum = 0;
 
-                Minimax.positions = 0;
-                a3 = b1.generateBoardWithMove(Utility.ANtoPos(c + "7"), Utility.ANtoPos(c + "5"), Piece.bPawn);
-                Minimax.miniMax(a3, d, float.MinValue, float.MaxValue, true);
-                Console.WriteLine(c + "5: " + Minimax.positions);
-                sum += Minimax.positions;
-            }
+			Minimax.positions = 0;
+			var n1 = b1.generateBoardWithMove(Utility.ANtoPos("b8"), Utility.ANtoPos("a6"), Piece.bKnight);
+			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
+			Console.WriteLine("Na6: " + Minimax.positions);
+			sum += Minimax.positions;
 
-            Console.WriteLine("Sum: " + sum);
-        }
+			//DisplayBoard(n1);
 
-        static Chessboard visualBoard; //board auf dem die "wahre" position gespeichert wird
+			//return;
 
-        static void Main(string[] args)
-        {
-            visualBoard = new Chessboard();
+			Minimax.positions = 0;
+			n1 = b1.generateBoardWithMove(Utility.ANtoPos("b8"), Utility.ANtoPos("c6"), Piece.bKnight);
+			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
+			Console.WriteLine("Nc6: " + Minimax.positions);
+			sum += Minimax.positions;
 
-            MainLoop();
-        }
-    }
+			Minimax.positions = 0;
+			n1 = b1.generateBoardWithMove(Utility.ANtoPos("g8"), Utility.ANtoPos("f6"), Piece.bKnight);
+			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
+			Console.WriteLine("Nf6: " + Minimax.positions);
+			sum += Minimax.positions;
+
+			Minimax.positions = 0;
+			n1 = b1.generateBoardWithMove(Utility.ANtoPos("g8"), Utility.ANtoPos("h6"), Piece.bKnight);
+			Minimax.miniMax(n1, d, float.MinValue, float.MaxValue, true);
+			Console.WriteLine("Nh6: " + Minimax.positions);
+			sum += Minimax.positions;
+
+
+			foreach (char c in l)
+			{
+
+				Minimax.positions = 0;
+				var a3 = b1.generateBoardWithMove(Utility.ANtoPos(c + "7"), Utility.ANtoPos(c + "6"), Piece.bPawn);
+				Minimax.miniMax(a3, d, float.MinValue, float.MaxValue, true);
+				Console.WriteLine(c + "6: " + Minimax.positions);
+				sum += Minimax.positions;
+
+				Minimax.positions = 0;
+				a3 = b1.generateBoardWithMove(Utility.ANtoPos(c + "7"), Utility.ANtoPos(c + "5"), Piece.bPawn);
+				Minimax.miniMax(a3, d, float.MinValue, float.MaxValue, true);
+				Console.WriteLine(c + "5: " + Minimax.positions);
+				sum += Minimax.positions;
+			}
+
+			Console.WriteLine("Sum: " + sum);
+		}
+
+		static Chessboard visualBoard; //board auf dem die "wahre" position gespeichert wird
+
+		static void Main(string[] args)
+		{
+			//visualBoard = new Chessboard();
+
+			//MainLoop();
+			Testing.BenchMarkMINIMAX();
+		}
+	}
 }

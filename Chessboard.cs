@@ -7,7 +7,6 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace fraction
 {
-
 	public class Chessboard
 	{
 		//0 ist ganz rechts, 63 ist ganz links, 0=a1, 63=h8
@@ -30,6 +29,7 @@ namespace fraction
 		public bool afterCapturePly = false;
 		public int quiescenceSearchPlies = 0;
 
+		public Chessboard() {}
 
 		/// <summary>
 		/// Hiermit kann durch FENtoPos funktionen ein board gebaut werden
@@ -53,11 +53,6 @@ namespace fraction
 
 			whitePiecesBB = wPawnBB | wBishopBB | wKingBB | wKnightBB | wRookBB | wQueenBB;
 			blackPiecesBB = bPawnBB | bBishopBB | bKingBB | bKnightBB | bRookBB | bQueenBB;
-		}
-
-		public Chessboard()
-		{
-
 		}
 
 		public Chessboard(ulong wKingBB, ulong bKingBB, ulong wKnightBB, ulong bKnightBB,
