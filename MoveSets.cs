@@ -1,9 +1,9 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 
 namespace fraction
@@ -20,116 +20,146 @@ namespace fraction
 			//wir entfernen die bits wo pieces der selben farbe stehen
 			//===> wir haben ein bitboard mit sqrs die das piece effektiv angreifen kann
 
+			ulong mask = 1ul << posIndex;
+			ulong piece = 0;
+			piece |= ((board.wPawnBB & mask) >>> posIndex) << (int)Piece.wPawn;
+			piece |= ((board.bPawnBB & mask) >>> posIndex) << (int)Piece.bPawn;
+			piece |= ((board.wRookBB & mask) >>> posIndex) << (int)Piece.wRook;
+			piece |= ((board.bRookBB & mask) >>> posIndex) << (int)Piece.bRook;
+			piece |= ((board.wKnightBB & mask) >>> posIndex) << (int)Piece.wKnight;
+			piece |= ((board.bKnightBB & mask) >>> posIndex) << (int)Piece.bKnight;
+			piece |= ((board.wKingBB & mask) >>> posIndex) << (int)Piece.wKing;
+			piece |= ((board.bKingBB & mask) >>> posIndex) << (int)Piece.bKing;
+			piece |= ((board.wBishopBB & mask) >>> posIndex) << (int)Piece.wBishop;
+			piece |= ((board.bBishopBB & mask) >>> posIndex) << (int)Piece.bBishop;
+			piece |= ((board.wQueenBB & mask) >>> posIndex) << (int)Piece.wQueen;
+			piece |= ((board.bQueenBB & mask) >>> posIndex) << (int)Piece.bQueen;
+
 			bool isWhite = IsBitSet(board.whitePiecesBB, posIndex);
 			ulong sameColorPieces = isWhite ? board.whitePiecesBB : board.blackPiecesBB;
 
-			if (IsBitSet(board.wPawnBB, posIndex))
+			switch (piece)
 			{
-				pieceType = Piece.wPawn;
-				int y = posIndex >> 3;
-				int x = posIndex & 7;
+				//if (IsBitSet(board.wPawnBB, posIndex))
+				case 1 << (int)Piece.wPawn:
+					{
+						pieceType = Piece.wPawn;
+						int y = posIndex >> 3;
+						int x = posIndex & 7;
 
-				//ulong attackSqrs = 0b101ul << (posIndex + 7);//covered die 2 sqrs die diagonal vor dem pawn liegen
-				ulong attackSqrs = BB_Lookup.getPawnAttackSqrs(x, y, true);
-				ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
+						//ulong attackSqrs = 0b101ul << (posIndex + 7);//covered die 2 sqrs die diagonal vor dem pawn liegen
+						ulong attackSqrs = BB_Lookup.getPawnAttackSqrs(x, y, true);
+						ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
 
-				ulong enemyPiecesBB = allPiecesBB & ~sameColorPieces;
+						ulong enemyPiecesBB = allPiecesBB & ~sameColorPieces;
 
-				ulong targetSqrs = (attackSqrs & enemyPiecesBB);
-				ulong moveSqrs = (~allPiecesBB & (1ul << posIndex + 8));
+						ulong targetSqrs = (attackSqrs & enemyPiecesBB);
+						ulong moveSqrs = (~allPiecesBB & (1ul << posIndex + 8));
 
-				int sqrTwoAbove = posIndex + 16;
-				moveSqrs |= (moveSqrs != 0 && !IsBitSet(allPiecesBB, sqrTwoAbove)) ? (y == 1 ? 1ul << sqrTwoAbove : 0) : 0;
-				return targetSqrs | moveSqrs;
+						int sqrTwoAbove = posIndex + 16;
+						moveSqrs |= (moveSqrs != 0 && !IsBitSet(allPiecesBB, sqrTwoAbove)) ? (y == 1 ? 1ul << sqrTwoAbove : 0) : 0;
+						return targetSqrs | moveSqrs;
+					}
+				//else if (IsBitSet(board.bPawnBB, posIndex))
+				case 1 << (int)Piece.bPawn:
+					{
+						pieceType = Piece.bPawn;
+
+						int y = posIndex >> 3;
+						int x = posIndex & 7;
+
+						//ulong attackSqrs = 0b101ul << (posIndex - 9);//covered die 2 sqrs die diagonal vor dem pawn liegen
+						ulong attackSqrs = BB_Lookup.getPawnAttackSqrs(x, y, false);
+						ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
+
+						ulong enemyPiecesBB = allPiecesBB & ~sameColorPieces;
+
+						ulong targetSqrs = (attackSqrs & enemyPiecesBB);
+						ulong moveSqrs = (~allPiecesBB & (1ul << posIndex - 8));
+
+						int sqrTwoAbove = posIndex - 16;
+						moveSqrs |= (moveSqrs != 0 && !IsBitSet(allPiecesBB, sqrTwoAbove)) ? (y == 6 ? 1ul << (sqrTwoAbove) : 0) : 0;
+
+						return targetSqrs | moveSqrs;
+					}
+				//else if (IsBitSet(board.bRookBB | board.wRookBB, posIndex))
+				case 1 << (int)Piece.wRook:
+				case 1 << (int)Piece.bRook:
+					{
+						pieceType = isWhite ? Piece.wRook : Piece.bRook;
+
+						ulong patternBB = BB_Lookup.getBBforPieceAtSqr(Piece.bRook, posIndex);
+						ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
+
+						ulong targetBB = patternBB & allPiecesBB;
+
+						ulong pseudoTargetSqrs = getPseudoTargetSqrsRook(targetBB, posIndex);
+						ulong targetSqrs = pseudoTargetSqrs & ~sameColorPieces;
+
+						return targetSqrs;
+					}
+				//else if (IsBitSet(board.wKnightBB | board.bKnightBB, posIndex))
+				case 1 << (int)Piece.wKnight:
+				case 1 << (int)Piece.bKnight:
+					{
+						pieceType = isWhite ? Piece.wKnight : Piece.bKnight;
+
+						ulong patternBB = BB_Lookup.getBBforPieceAtSqr(Piece.bKnight, posIndex);
+
+						ulong targetSqrs = patternBB & ~sameColorPieces;
+
+						return targetSqrs;
+					}//es ist ein king, beinah selber code wie beim knight wegen der konstanten anzahl an mgl feldern
+					 //else if (IsBitSet(board.wKingBB | board.bKingBB, posIndex))
+				case 1 << (int)Piece.wKing:
+				case 1 << (int)Piece.bKing:
+					{
+						pieceType = isWhite ? Piece.wKing : Piece.bKing;
+
+						ulong patternBB = BB_Lookup.getBBforPieceAtSqr(Piece.bKing, posIndex);
+
+						ulong targetSqrs = patternBB & ~sameColorPieces;
+
+						return targetSqrs;
+					}//es ist ein bishop, beinahe selber code wie rook wegen ähnlichem attackpattern
+					 //else if (IsBitSet(board.wBishopBB | board.bBishopBB, posIndex))
+				case 1 << (int)Piece.wBishop:
+				case 1 << (int)Piece.bBishop:
+					{
+						pieceType = isWhite ? Piece.wBishop : Piece.bBishop;
+						ulong patternBB = BB_Lookup.getBBforPieceAtSqr(Piece.bBishop, posIndex);
+						ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
+
+						ulong targetBB = patternBB & allPiecesBB;
+
+						ulong pseudoTargetSqrs = getPseudoTargetSqrsBishop(targetBB, posIndex);
+						ulong targetSqrs = pseudoTargetSqrs & ~sameColorPieces;
+
+						return targetSqrs;
+					}//es ist eine queen
+					 //else if (IsBitSet(board.wQueenBB | board.bQueenBB, posIndex))
+				case 1 << (int)Piece.wQueen:
+				case 1 << (int)Piece.bQueen:
+					{
+						pieceType = isWhite ? Piece.wQueen : Piece.bQueen;
+						ulong patternBB1 = BB_Lookup.getBBforPieceAtSqr(Piece.bBishop, posIndex);
+						ulong patternBB2 = BB_Lookup.getBBforPieceAtSqr(Piece.bRook, posIndex);
+
+						ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
+
+
+						ulong targetBB1 = patternBB1 & allPiecesBB;
+						ulong targetBB2 = patternBB2 & allPiecesBB;
+						ulong pseudoTargetSqrs = getPseudoTargetSqrsBishop(targetBB1, posIndex) | getPseudoTargetSqrsRook(targetBB2, posIndex);
+
+						ulong targetSqrs = pseudoTargetSqrs & ~sameColorPieces;
+
+						return targetSqrs;
+					}//das moveset der pawns ist abhängig von der farbe
 			}
-			else if (IsBitSet(board.bPawnBB, posIndex))
-			{
-				pieceType = Piece.bPawn;
-
-				int y = posIndex >> 3;
-				int x = posIndex & 7;
-
-				//ulong attackSqrs = 0b101ul << (posIndex - 9);//covered die 2 sqrs die diagonal vor dem pawn liegen
-				ulong attackSqrs = BB_Lookup.getPawnAttackSqrs(x, y, false);
-				ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
-
-				ulong enemyPiecesBB = allPiecesBB & ~sameColorPieces;
-
-				ulong targetSqrs = (attackSqrs & enemyPiecesBB);
-				ulong moveSqrs = (~allPiecesBB & (1ul << posIndex - 8));
-
-				int sqrTwoAbove = posIndex - 16;
-				moveSqrs |= (moveSqrs != 0 && !IsBitSet(allPiecesBB, sqrTwoAbove)) ? (y == 6 ? 1ul << (sqrTwoAbove) : 0) : 0;
-
-				return targetSqrs | moveSqrs;
-			}
-			else if (IsBitSet(board.bRookBB | board.wRookBB, posIndex))
-			{
-				pieceType = isWhite ? Piece.wRook : Piece.bRook;
-
-				ulong patternBB = BB_Lookup.getBBforPieceAtSqr(Piece.bRook, posIndex);
-				ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
-
-				ulong targetBB = patternBB & allPiecesBB;
-
-				ulong pseudoTargetSqrs = getPseudoTargetSqrsRook(targetBB, posIndex);
-				ulong targetSqrs = pseudoTargetSqrs & ~sameColorPieces;
-
-				return targetSqrs;
-			}
-			else if (IsBitSet(board.wKnightBB | board.bKnightBB, posIndex))
-			{
-				pieceType = isWhite ? Piece.wKnight : Piece.bKnight;
-
-				ulong patternBB = BB_Lookup.getBBforPieceAtSqr(Piece.bKnight, posIndex);
-
-				ulong targetSqrs = patternBB & ~sameColorPieces;
-
-				return targetSqrs;
-			}//es ist ein king, beinah selber code wie beim knight wegen der konstanten anzahl an mgl feldern
-			else if (IsBitSet(board.wKingBB | board.bKingBB, posIndex))
-			{
-				pieceType = isWhite ? Piece.wKing : Piece.bKing;
-
-				ulong patternBB = BB_Lookup.getBBforPieceAtSqr(Piece.bKing, posIndex);
-
-				ulong targetSqrs = patternBB & ~sameColorPieces;
-
-				return targetSqrs;
-			}//es ist ein bishop, beinahe selber code wie rook wegen ähnlichem attackpattern
-			else if (IsBitSet(board.wBishopBB | board.bBishopBB, posIndex))
-			{
-				pieceType = isWhite ? Piece.wBishop : Piece.bBishop;
-				ulong patternBB = BB_Lookup.getBBforPieceAtSqr(Piece.bBishop, posIndex);
-				ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
-
-				ulong targetBB = patternBB & allPiecesBB;
-
-				ulong pseudoTargetSqrs = getPseudoTargetSqrsBishop(targetBB, posIndex);
-				ulong targetSqrs = pseudoTargetSqrs & ~sameColorPieces;
-
-				return targetSqrs;
-			}//es ist eine queen
-			else if (IsBitSet(board.wQueenBB | board.bQueenBB, posIndex))
-			{
-				pieceType = isWhite ? Piece.wQueen : Piece.bQueen;
-				ulong patternBB1 = BB_Lookup.getBBforPieceAtSqr(Piece.bBishop, posIndex);
-				ulong patternBB2 = BB_Lookup.getBBforPieceAtSqr(Piece.bRook, posIndex);
-
-				ulong allPiecesBB = board.whitePiecesBB | board.blackPiecesBB;
-
-
-				ulong targetBB1 = patternBB1 & allPiecesBB;
-				ulong targetBB2 = patternBB2 & allPiecesBB;
-				ulong pseudoTargetSqrs = getPseudoTargetSqrsBishop(targetBB1, posIndex) | getPseudoTargetSqrsRook(targetBB2, posIndex);
-
-				ulong targetSqrs = pseudoTargetSqrs & ~sameColorPieces;
-
-				return targetSqrs;
-			}//das moveset der pawns ist abhängig von der farbe
 
 			pieceType = Piece.wKing;//default value
-			Console.WriteLine("Something went wrong in getPseudoLegalMovesBB, index = " + posIndex);
+			Console.WriteLine("Something went wrong in getPseudoLegalMovesBB, index = " + posIndex + piece);
 			Program.DisplayBoard(board);
 			return 0;
 		}
